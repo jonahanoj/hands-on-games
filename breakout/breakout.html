@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+
+        #gameCanvas {
+            margin: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <script>
+
+        function getMouse(evt) {
+            var rect = canvas.getBoundingClientRect(),
+                root = document.documentElement;
+            var mouseX = evt.clientX - rect.left - root.scrollLeft;
+            var mouseY = evt.clientY - rect.top - root.scrollTop;
+            return { x: mouseX, y: mouseY };
+        }
+
+        const PADDLE_WIDTH = 100,
+            PADDLE_Y = 540,
+            PADDLE_HEIGHT = 10,
+            BRICK_W = 80,
+            BRICK_H = 20,
+            BRICK_GAP = 2,
+            BRICK_COLS = 10,
+            BRICK_ROWS = 14,
+            EMPTY_ROWS = 3;
+
+        var canvas,
+            ctx,
+            ballX, ballY, ballSpeedX, ballSpeedY,
+            paddleX,
+            remainingBricks;
+
+        var brickGrid = new Array(BRICK_COLS * BRICK_ROWS);
+
+        window.onload = function () {
+
+            canvas = document.getElementById('gameCanvas');
+            ctx = canvas.getContext('2d');
+
+            canvas.addEventListener('mousemove', function (evt) {
+                var mousePos = getMouse(evt);
+                paddleX = mousePos.x - (PADDLE_WIDTH / 2);
+
+            });
+
+            paddleX = canvas.width / 2;
+            reset();
+            resetBricks();
+            update();
+            ballReset();
+        };
+
+
+        function update() {
+            draw();
+            move();
+            requestAnimationFrame(update);
+        }
+
+        function reset() {
+
+            ballX = canvas.width / 2;
+            ballY = canvas.height / 2;
+            ballSpeedX = 0;
+            ballSpeedY = 5;
+
+        }
+
+        function move() {
+            if (ballX < 0) {
+                ballSpeedX *= -1;
+            }
+
+            if (ballX > canvas.width) {
+                ballSpeedX *= -1;
+            }
+
+            if (ballY < 0) {
+                ballSpeedY *= -1;
+            }
+
+            if (ballY > canvas.height) { // bottom of screen
+                reset();
+            }
+
+            if (ballY > PADDLE_Y && ballY < PADDLE_Y + PADDLE_HEIGHT &&
+                ballX > paddleX && ballX < paddleX + PADDLE_WIDTH) { // we've collided
+                if (ballSpeedY > 0) {
+                    ballSpeedY *= -1;
+                }
+                ballSpeedX = (ballX - (paddleX + PADDLE_WIDTH / 2)) / 3
+                if (remainingBricks == 0) {
+                    resetBricks();
+                }
+            }
+
+            breakAndBounceOffBrickAtPixelCoord(ballX, ballY);
+
+            ballX += ballSpeedX;
+            ballY += ballSpeedY;
+        }
+
+        function rect(x, y, w, h, c) {
+            ctx.fillStyle = c;
+            ctx.fillRect(x, y, w, h);
+        }
+
+        function circle(x, y, r, c) {
+            ctx.fillStyle = c;
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2, true);
+            ctx.fill();
+        }
+
+        function drawBricks() {
+            for (var eachCol = 0; eachCol < BRICK_COLS; eachCol++) {
+                for (var eachRow = 0; eachRow < BRICK_ROWS; eachRow++) {
+                    if (isBrickAtTileCoord(eachCol, eachRow)) {
+                        var brickLeftEdgeX = eachCol * BRICK_W;
+                        var brickTopEdgeY = eachRow * BRICK_H;
+
+                        rect(brickLeftEdgeX, brickTopEdgeY,
+                            BRICK_W - BRICK_GAP,
+                            BRICK_H - BRICK_GAP,
+                            'yellow');
+                    }
+                }
+            }
+        }
+
+
+        function draw() {
+            rect(0, 0, canvas.width, canvas.height, 'black');
+            rect(paddleX, PADDLE_Y, PADDLE_WIDTH, PADDLE_HEIGHT, '#aaffaa');
+            circle(ballX, ballY, 6.5, 'blue');
+            drawBricks();
+        }
+
+        function resetBricks() {
+            var emptyBricks = BRICK_COLS * EMPTY_ROWS;
+            remainingBricks = BRICK_COLS * BRICK_ROWS - emptyBricks;
+            for (var i = 0; i < BRICK_COLS * BRICK_ROWS; i++) {
+                brickGrid[i] = i < emptyBricks ? 0 : 1;
+            }
+        }
+
+        function brickTileToIndex(tileCol, tileRow) {
+            return (tileCol + BRICK_COLS * tileRow);
+        }
+
+        function isBrickAtTileCoord(brickTileCol, brickTileRow) {
+            var brickIndex = brickTileCol + BRICK_COLS * brickTileRow;
+            return (brickGrid[brickIndex] == 1);
+        }
+
+        function breakAndBounceOffBrickAtPixelCoord(pixelX, pixelY) {
+            var tileCol = pixelX / BRICK_W;
+            var tileRow = pixelY / BRICK_H;
+
+            tileCol = Math.floor(tileCol);
+            tileRow = Math.floor(tileRow);
+
+
+            if (tileCol < 0 || tileCol >= BRICK_COLS ||
+                tileRow < 0 || tileRow >= BRICK_ROWS) {
+                return;
+            }
+
+            var brickIndex = brickTileToIndex(tileCol, tileRow);
+            if (brickGrid[brickIndex] == 1) {
+                // we've hit a brick
+
+                // where did we just come from?
+                var prevBallX = ballX - ballSpeedX;
+                var prevBallY = ballY - ballSpeedY;
+                var prevTileCol = Math.floor(prevBallX / BRICK_W);
+                var prevTileRow = Math.floor(prevBallY / BRICK_H);
+
+                var bothTestsFailed = true;
+
+                if (prevTileCol != tileCol
+                    && brickGrid[brickTileToIndex(prevTileCol, tileRow)] != 1) {
+                    ballSpeedX *= -1;
+                    bothTestsFailed = false;
+                }
+
+                if (prevTileRow != tileRow
+                    && brickGrid[brickTileToIndex(tileCol, prevTileRow)] != 1) {
+                    ballSpeedY *= -1;
+                    bothTestsFailed = false;
+                }
+
+                if (bothTestsFailed) {
+                    ballSpeedX *= -1;
+                    ballSpeedY *= -1;
+                }
+
+                brickGrid[brickIndex] = 0;
+                remainingBricks--;
+            }
+        }
+
+
+    </script>

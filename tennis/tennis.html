@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+
+        #gameCanvas {
+            margin: 10px;
+
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <script>
+
+        function calculateMousePos(evt) {
+            var rect = canvas.getBoundingClientRect(),
+                root = document.documentElement;
+            var mouseX = evt.clientX - rect.left - root.scrollLeft;
+            var mouseY = evt.clientY - rect.top - root.scrollTop;
+            return { x: mouseX, y: mouseY };
+        }
+
+        const PADDLE_HEIGHT = 100,
+            PADDLE_THICKNESS = 10,
+            MAX_COMP_SPEED = 8,
+            WIN_SCORE = 3,
+            Y_FACTOR = 2.5,
+            P1_COLOR = 'red',
+            P2_COLOR = 'blue';
+
+        var canvas,
+            canvasContext,
+            ballX = 75,
+            ballY = 75,
+            ballSpeedX = Y_FACTOR * 2,
+            ballSpeedY = Y_FACTOR * 2,
+            ballColor = P1_COLOR,
+            paddle1Y = 250,
+            paddle2Y = 250
+        p1Score = 0,
+            p2Score = 0,
+            showingWinScreen = false;
+
+
+
+        window.onload = function () {
+            // runs when page finishes loading
+            canvas = document.getElementById('gameCanvas');
+            canvasContext = canvas.getContext('2d');
+            canvasContext.font = '16px sans-serif';
+            canvasContext.textAlign = 'center';
+
+            canvas.addEventListener('mousemove', function (evt) {
+                var mousePos = calculateMousePos(evt);
+                paddle1Y = mousePos.y - (PADDLE_HEIGHT / 2);
+            });
+
+            canvas.addEventListener('click', function (evt) {
+                showingWinScreen = false;
+            });
+
+            update();
+        };
+
+        function update() {
+            if (!showingWinScreen) {
+                drawEverything();
+                moveEverything();
+            }
+
+            requestAnimationFrame(update);
+        }
+
+        function ballReset() {
+            if (p1Score == WIN_SCORE || p2Score == WIN_SCORE) {
+                showingWinScreen = true;
+                colorRect(0, 0, canvas.width, canvas.height, 'black');
+                printScores();
+                var whoWon = p1Score > p2Score ? 'You Win!' : 'Computer Won!';
+                colorText(canvas.width / 2, canvas.height / 2, whoWon, 'white');
+                colorText(canvas.width / 2, canvas.height - 40, 'Click to start a new match!', 'white');
+                p1Score = 0;
+                p2Score = 0;
+            }
+            ballX = canvas.width / 2;
+            ballY = canvas.height / 2;
+            ballSpeedY = Math.floor(Math.random() * 20) - 10;
+        }
+
+        function moveComputerPaddle() {
+            var paddle2Center = paddle2Y + PADDLE_HEIGHT / 2;
+            if (ballY < paddle2Center - 35) {
+                paddle2Y -= MAX_COMP_SPEED;
+            }
+            if (ballY > paddle2Center + 35) {
+                paddle2Y += MAX_COMP_SPEED;
+            }
+        }
+
+        function moveEverything() {
+
+            moveComputerPaddle();
+
+            if (ballX < 0) { // ball is past left side screen
+                ballSpeedX *= -1;
+                ballColor = P1_COLOR;
+                if (ballY < paddle1Y || ballY > paddle1Y + PADDLE_HEIGHT) { // did left paddle miss it?
+                    p2Score++;
+                    ballReset();
+                } else {
+                    var paddle1Center = paddle1Y + PADDLE_HEIGHT / 2;
+                    ballSpeedY = (ballY - paddle1Center) / Y_FACTOR;
+                }
+            }
+
+
+            if (ballX > canvas.width) { // ball is past right side of screen
+                ballSpeedX *= -1;
+                ballColor = P2_COLOR;
+                if (ballY < paddle2Y || ballY > paddle2Y + PADDLE_HEIGHT) { // did right paddle miss it?
+                    p1Score++;
+                    ballReset();
+                } else {
+                    var paddle2Center = paddle2Y + PADDLE_HEIGHT / 2;
+                    ballSpeedY = (ballY - paddle2Center) / Y_FACTOR;
+                }
+            }
+
+            if (ballY > canvas.height || ballY < 0) {
+                ballSpeedY *= -1;
+            }
+
+            ballX += ballSpeedX;
+            ballY += ballSpeedY;
+        }
+
+        function colorRect(topLeftX, topLeftY, boxWidth, boxHeight, fillColor) {
+            canvasContext.fillStyle = fillColor;
+            canvasContext.fillRect(topLeftX, topLeftY, boxWidth, boxHeight);
+        }
+
+        function colorCircle(centerX, centerY, radius, fillColor) {
+            canvasContext.fillStyle = fillColor;
+            canvasContext.beginPath();
+            canvasContext.arc(centerX, centerY, radius, 0, Math.PI * 2, true);
+            canvasContext.fill();
+        }
+
+        function colorText(x, y, msg, fillColor) {
+            canvasContext.fillStyle = fillColor;
+            canvasContext.fillText(msg, x, y);
+        }
+
+        function printScores() {
+            colorText(100, 100, p1Score, P1_COLOR);
+            colorText(canvas.width - 100, 100, p2Score, P2_COLOR);
+        }
+
+        function drawEverything() {
+            colorRect(0, 0, canvas.width, canvas.height, 'black');
+            colorRect(0, paddle1Y, PADDLE_THICKNESS, PADDLE_HEIGHT, 'red');
+            colorRect(canvas.width - PADDLE_THICKNESS, paddle2Y, PADDLE_THICKNESS, PADDLE_HEIGHT, 'blue');
+
+            for (var i = 0; i < canvas.height / 40; i++) {
+                colorRect(canvas.width / 2 - 1, i * 40, 2, 20, 'white')
+            }
+
+            colorCircle(ballX, ballY, 10, ballColor);
+
+            printScores();
+        }
+
+    </script>
+
+</body>
+
+</html>
