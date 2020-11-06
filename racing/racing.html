@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    <title>Racing</title>
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+
+        #gameCanvas {
+            margin: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <p id="debugText">(debug text)</p>
+    <script>
+        function dlog(msg) {
+            document.getElementById("debugText").innerHTML = msg;
+        }
+
+        const TRACK_W = 40,
+            TRACK_H = 40,
+            TRACK_GAP = 1,
+            TRACK_COLS = 20,
+            TRACK_ROWS = 15;
+
+        var canvas,
+            ctx,
+            carX, carY, carSpeed, carAng = 0;
+        var carPic = document.createElement("img");
+        var carPicLoaded = false;
+    
+
+        var trackGrid =
+               [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
+                1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+                1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1,
+                1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1,
+                1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 1,
+                1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1,
+                1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1,
+                1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
+                1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
+                1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1,
+                1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
+                1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1,
+                1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+
+        function keyPressed(evt) {
+            dlog("KeyCode Pushed: " + evt.keyCode);
+        }
+
+        function keyReleased(evt) {
+            dlog("KeyCode Released: " + evt.keyCode);
+        }
+
+        window.onload = function () {
+            canvas = document.getElementById('gameCanvas');
+            ctx = canvas.getContext('2d');
+
+            document.addEventListener("keydown", keyPressed);
+            document.addEventListener("keyup", keyReleased);
+
+            carPic.onload = function() {
+                carPicLoaded = true;
+            }
+            carPic.src = "player1.png"
+
+            reset();
+            update();
+        };
+
+
+        function update() {
+            draw();
+            move();
+            requestAnimationFrame(update);
+        }
+
+        function reset() {
+            carX = canvas.width / 2 + 50;
+            carY = canvas.height / 2;
+            carSpeed = 0;
+        }
+
+        function move() {
+            carAng+=0.04 * (1 + carSpeed/10);
+            carSpeed+=0.02;
+            carX += Math.cos(carAng) * carSpeed;
+            carY += Math.sin(carAng) * carSpeed;
+        }
+
+        function rect(x, y, w, h, c) {
+            ctx.fillStyle = c;
+            ctx.fillRect(x, y, w, h);
+        }
+
+        function circle(x, y, r, c) {
+            ctx.fillStyle = c;
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2, true);
+            ctx.fill();
+        }
+
+        function drawTracks() {
+            for (var eachCol = 0; eachCol < TRACK_COLS; eachCol++) {
+                for (var eachRow = 0; eachRow < TRACK_ROWS; eachRow++) {
+                    if (isTrackAtTileCoord(eachCol, eachRow)) {
+                        var trackLeftEdgeX = eachCol * TRACK_W;
+                        var trackTopEdgeY = eachRow * TRACK_H;
+
+                        rect(trackLeftEdgeX, trackTopEdgeY,
+                            TRACK_W - TRACK_GAP,
+                            TRACK_H - TRACK_GAP,
+                            'yellow');
+                    }
+                }
+            }
+        }
+
+        function drawImage(graphic, atX, atY, withAngle) {
+            ctx.save();
+            ctx.translate(atX, atY);
+            ctx.rotate(withAngle);
+            ctx.drawImage(graphic, - graphic.width / 2, - graphic.height / 2);
+            ctx.restore();
+        }
+
+        function carDraw() {
+            if (carPicLoaded) {
+                drawImage(carPic, carX, carY, carAng);
+            }
+        }
+
+        function draw() {
+            rect(0, 0, canvas.width, canvas.height, 'black');
+            drawTracks();
+            carDraw();
+
+        }
+
+        function trackTileToIndex(tileCol, tileRow) {
+            return (tileCol + TRACK_COLS * tileRow);
+        }
+
+        function isTrackAtTileCoord(trackTileCol, trackTileRow) {
+            var trackIndex = trackTileCol + TRACK_COLS * trackTileRow;
+            return (trackGrid[trackIndex] == 1);
+        }
+
+        function bounceOffTrackAtPixelCoord(pixelX, pixelY) {
+            var tileCol = pixelX / TRACK_W;
+            var tileRow = pixelY / TRACK_H;
+
+            tileCol = Math.floor(tileCol);
+            tileRow = Math.floor(tileRow);
+
+
+            if (tileCol < 0 || tileCol >= TRACK_COLS ||
+                tileRow < 0 || tileRow >= TRACK_ROWS) {
+                return;
+            }
+
+            var trackIndex = trackTileToIndex(tileCol, tileRow);
+            if (trackGrid[trackIndex] == 1) {
+                // we've hit a track
+
+                // where did we just come from?
+                var prevCarX = carX - carSpeedX;
+                var prevCarY = carY - carSpeedY;
+                var prevTileCol = Math.floor(prevCarX / TRACK_W);
+                var prevTileRow = Math.floor(prevCarY / TRACK_H);
+
+                var bothTestsFailed = true;
+
+                if (prevTileCol != tileCol
+                    && trackGrid[trackTileToIndex(prevTileCol, tileRow)] != 1) {
+                    carSpeedX *= -1;
+                    bothTestsFailed = false;
+                }
+
+                if (prevTileRow != tileRow
+                    && trackGrid[trackTileToIndex(tileCol, prevTileRow)] != 1) {
+                    carSpeedY *= -1;
+                    bothTestsFailed = false;
+                }
+
+                if (bothTestsFailed) {
+                    carSpeedX *= -1;
+                    carSpeedY *= -1;
+                }
+            }
+        }
+
+    </script>
+</body>
+
+</html>
