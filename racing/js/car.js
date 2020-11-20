@@ -5,8 +5,6 @@ const GROUNDSPEED_DECAY_MULT = 0.94,
     MIN_TURN_SPEED = 0.5;
 
 var carX, carY, carSpeed, carAng = 0;
-var carPic = document.createElement("img");
-var carPicLoaded = false;
 var keyHeld_Gas = false;
 var keyHeld_Reverse = false;
 var keyHeld_TurnLeft = false;
@@ -28,11 +26,6 @@ function setKeyHoldState(thisKey, setTo) {
 }
 
 function carInit() {
-    carPic.onload = function () {
-        carPicLoaded = true;
-    }
-    carPic.src = "player1.png"
-    
     for (var i = 0; i < trackGrid.length; i++) {
         if (trackGrid[i] == 2) {
             var tileRow = Math.floor(i / TRACK_COLS);
@@ -49,9 +42,7 @@ function carInit() {
 }
 
 function carDraw() {
-    if (carPicLoaded) {
-        drawImage(carPic, carX, carY, carAng);
-    }
+    drawImage(carPic, carX, carY, carAng);
 }
 
 function carMove() {

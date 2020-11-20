@@ -1,6 +1,5 @@
 const TRACK_W = 40,
     TRACK_H = 40,
-    TRACK_GAP = 1,
     TRACK_COLS = 20,
     TRACK_ROWS = 15;
 
@@ -53,14 +52,12 @@ function checkForTrackAtPixelCoord(pixelX, pixelY) {
 function drawTracks() {
     for (var eachCol = 0; eachCol < TRACK_COLS; eachCol++) {
         for (var eachRow = 0; eachRow < TRACK_ROWS; eachRow++) {
+            var trackLeftEdgeX = eachCol * TRACK_W;
+            var trackTopEdgeY = eachRow * TRACK_H;
             if (isWallAtTileCoord(eachCol, eachRow)) {
-                var trackLeftEdgeX = eachCol * TRACK_W;
-                var trackTopEdgeY = eachRow * TRACK_H;
-
-                rect(trackLeftEdgeX, trackTopEdgeY,
-                    TRACK_W - TRACK_GAP,
-                    TRACK_H - TRACK_GAP,
-                    'yellow');
+                ctx.drawImage(trackPicWall, trackLeftEdgeX, trackTopEdgeY);
+            } else {
+                ctx.drawImage(trackPicRoad, trackLeftEdgeX, trackTopEdgeY);
             }
         }
     }

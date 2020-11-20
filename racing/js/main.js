@@ -10,8 +10,12 @@ window.onload = function () {
 
     initInput();
     carInit();
-    update();
+    loadImages();
 };
+
+function loadingDone() {
+    update();
+}
 
 function update() {
     draw();
@@ -24,7 +28,6 @@ function move() {
 }
 
 function draw() {
-    rect(0, 0, canvas.width, canvas.height, 'black');
     drawTracks();
     carDraw();
 }
