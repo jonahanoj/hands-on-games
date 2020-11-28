@@ -4,33 +4,35 @@ const TRACK_W = 40,
     TRACK_ROWS = 15;
 
 var trackGrid =
-       [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
+       [4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4,
+        4, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
         1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
         1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1,
-        1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1,
-        1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 1,
-        1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1,
+        1, 0, 0, 0, 1, 1, 1, 4, 4, 4, 4, 1, 1, 1, 1, 1, 1, 0, 0, 1,
+        1, 0, 0, 1, 1, 1, 1, 1, 4, 4, 1, 1, 0, 0, 0, 1, 1, 0, 0, 1,
+        1, 0, 0, 1, 0, 0, 0, 0, 1, 4, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1,
         1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1,
-        1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
-        1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
-        1, 0, 2, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1,
-        1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
-        1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1,
-        1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1,
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+        1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 5, 0, 0, 1, 0, 0, 1,
+        1, 0, 0, 1, 0, 0, 5, 0, 0, 0, 5, 0, 0, 1, 0, 0, 1, 0, 0, 1,
+        1, 0, 2, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 5, 0, 0, 1,
+        1, 1, 5, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
+        0, 3, 0, 0, 0, 0, 1, 4, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1,
+        0, 3, 0, 0, 0, 0, 1, 4, 4, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1,
+        1, 1, 5, 1, 1, 1, 1, 4, 4, 4, 4, 4, 4, 1, 1, 1, 1, 1, 1, 1];
 
 const TRACK_ROAD = 0,
     TRACK_WALL = 1,
-    TRACK_PLAYER = 2;
+    TRACK_PLAYER = 2,
+    TRACK_GOAL = 3,
+    TRACK_TREE = 4,
+    TRACK_FLAG = 5;
 
 function trackTileToIndex(tileCol, tileRow) {
     return (tileCol + TRACK_COLS * tileRow);
 }
 
 function isWallAtTileCoord(trackTileCol, trackTileRow) {
-    var trackIndex = trackTileCol + TRACK_COLS * trackTileRow;
-    return (trackGrid[trackIndex] == TRACK_WALL);
+    return (trackGrid[trackTileToIndex(trackTileCol, trackTileRow)] == TRACK_WALL);
 }
 
 function checkForTrackAtPixelCoord(pixelX, pixelY) {
@@ -50,15 +52,21 @@ function checkForTrackAtPixelCoord(pixelX, pixelY) {
 }
 
 function drawTracks() {
-    for (var eachCol = 0; eachCol < TRACK_COLS; eachCol++) {
-        for (var eachRow = 0; eachRow < TRACK_ROWS; eachRow++) {
-            var trackLeftEdgeX = eachCol * TRACK_W;
-            var trackTopEdgeY = eachRow * TRACK_H;
-            if (isWallAtTileCoord(eachCol, eachRow)) {
-                ctx.drawImage(trackPicWall, trackLeftEdgeX, trackTopEdgeY);
-            } else {
-                ctx.drawImage(trackPicRoad, trackLeftEdgeX, trackTopEdgeY);
-            }
+    var trackIndex = 0
+    var trackLeftEdgeX = 0
+    var trackTopEdgeY = 0
+    for (var eachRow = 0; eachRow < TRACK_ROWS; eachRow++) {
+
+        trackLeftEdgeX = 0;
+
+        for (var eachCol = 0; eachCol < TRACK_COLS; eachCol++) {
+        
+            var trackTypeHere = trackGrid[trackIndex];
+            ctx.drawImage(trackPics[trackTypeHere], trackLeftEdgeX, trackTopEdgeY);
+
+            trackIndex ++;
+            trackLeftEdgeX += TRACK_W;
         }
+        trackTopEdgeY += TRACK_H;
     }
 }

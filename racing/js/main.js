@@ -3,13 +3,14 @@ function dlog(msg) {
 }
 
 var canvas, ctx;
+var p1 = new carClass();
 
 window.onload = function () {
     canvas = document.getElementById('gameCanvas');
     ctx = canvas.getContext('2d');
 
     initInput();
-    carInit();
+    p1.carInit();
     loadImages();
 };
 
@@ -24,10 +25,10 @@ function update() {
 }
 
 function move() {
-    carMove();
+    p1.carMove();
 }
 
 function draw() {
     drawTracks();
-    carDraw();
+    p1.carDraw();
 }
