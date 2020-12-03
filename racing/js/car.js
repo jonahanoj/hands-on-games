@@ -21,7 +21,8 @@ function carClass() {
         this.controlKeyForTurnRight = rightKey;
     }
 
-    this.carInit = function() {
+    this.carInit = function(whichGraphic) {
+        this.myBitmap = whichGraphic;
         this.carReset();
     }
 
@@ -39,7 +40,7 @@ function carClass() {
     }
 
     this.carDraw = function() {
-        drawImage(carPic, this.carX, this.carY, this.carAng);
+        drawImage(this.myBitmap, this.carX, this.carY, this.carAng);
     }
 
     this.carMove = function() {

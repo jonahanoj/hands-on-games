@@ -1,4 +1,5 @@
 var carPic = document.createElement("img");
+var car2Pic = document.createElement("img");
 var trackPics = [];
 var picsToLoad = 0;
 
@@ -22,7 +23,8 @@ function loadImageForTrackCode(trackCode, fileName) {
 function loadImages() {
     var imageList = [
     {varName:carPic, theFile:"player1.png"},
-    
+    {varName:car2Pic, theFile:"player2.png"},
+
     {trackType:TRACK_ROAD, theFile:"track_road.png"},
     {trackType:TRACK_WALL, theFile:"track_wall.png"},
     {trackType:TRACK_GOAL, theFile:"track_goal.png"},

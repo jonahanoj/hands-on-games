@@ -4,13 +4,15 @@ function dlog(msg) {
 
 var canvas, ctx;
 var p1 = new carClass();
+var p2 = new carClass();
 
 window.onload = function () {
     canvas = document.getElementById('gameCanvas');
     ctx = canvas.getContext('2d');
 
     initInput();
-    p1.carInit();
+    p1.carInit(carPic);
+    p2.carInit(car2Pic);
     loadImages();
 };
 
@@ -26,9 +28,11 @@ function update() {
 
 function move() {
     p1.carMove();
+    p2.carMove();
 }
 
 function draw() {
     drawTracks();
     p1.carDraw();
+    p2.carDraw();
 }
