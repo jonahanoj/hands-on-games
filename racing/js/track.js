@@ -35,7 +35,7 @@ function isWallAtTileCoord(trackTileCol, trackTileRow) {
     return (trackGrid[trackTileToIndex(trackTileCol, trackTileRow)] == TRACK_WALL);
 }
 
-function checkForTrackAtPixelCoord(pixelX, pixelY) {
+function getTrackAtPixelCoord(pixelX, pixelY) {
     var tileCol = pixelX / TRACK_W;
     var tileRow = pixelY / TRACK_H;
 
@@ -44,11 +44,11 @@ function checkForTrackAtPixelCoord(pixelX, pixelY) {
 
     if (tileCol < 0 || tileCol >= TRACK_COLS ||
         tileRow < 0 || tileRow >= TRACK_ROWS) {
-        return false;
+        return TRACK_WALL;
     }
 
     var trackIndex = trackTileToIndex(tileCol, tileRow);
-    return (trackGrid[trackIndex] == TRACK_ROAD);
+    return trackGrid[trackIndex];
 }
 
 function drawTracks() {
