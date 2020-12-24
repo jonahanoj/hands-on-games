@@ -24,14 +24,15 @@ function warriorClass() {
     }
 
     this.reset = function() {
+        this.keysHeld = 0;
         if (this.homeX == undefined) {
-            for (var i = 0; i < trackGrid.length; i++) {
-                if (trackGrid[i] == TRACK_PLAYER) {
-                    var tileRow = Math.floor(i / TRACK_COLS);
-                    var tileCol = i % TRACK_COLS;
-                    this.homeX = tileCol * TRACK_W + 0.5 * TRACK_W;
-                    this.homeY = tileRow * TRACK_H + 0.5 * TRACK_H;
-                    trackGrid[i] = TRACK_ROAD;
+            for (var i = 0; i < roomGrid.length; i++) {
+                if (roomGrid[i] == TILE_PLAYER) {
+                    var tileRow = Math.floor(i / ROOM_COLS);
+                    var tileCol = i % ROOM_COLS;
+                    this.homeX = tileCol * TILE_W + 0.5 * TILE_W;
+                    this.homeY = tileRow * TILE_H + 0.5 * TILE_H;
+                    roomGrid[i] = TILE_GROUND;
                     break;
                 }
             }
@@ -64,15 +65,38 @@ function warriorClass() {
             nextX -= PLAYER_MOVE_SPEED
         }
 
-        var walkIntoTileType = getTrackAtPixelCoord(nextX, nextY);
+        var walkIntoTileIndex = getTileIndexAtPixelCoord(nextX, nextY);
+        var walkIntoTileType = TILE_WALL;
 
-        if(walkIntoTileType == TRACK_ROAD) {
-            this.x = nextX;
-            this.y = nextY;
-        } else if(walkIntoTileType == TRACK_GOAL) {
-            document.getElementById('debugText').innerHTML = this.myName + ' won';
-            this.reset();
-        } 
-    
+        if(walkIntoTileIndex != undefined) {
+            walkIntoTileType = roomGrid[walkIntoTileIndex];
+        }
+        switch (walkIntoTileType) {
+            case TILE_GROUND:
+                this.x = nextX;
+                this.y = nextY;
+                break;
+            case TILE_GOAL:
+                document.getElementById('debugText').innerHTML = this.myName + ' won';
+                this.reset();
+                break;
+            case TILE_DOOR:
+                if (this.keysHeld > 0) {
+                    this.keysHeld--;
+                    document.getElementById('debugText').innerHTML = 'Keys: ' + this.keysHeld;
+
+                    roomGrid[walkIntoTileIndex] = TILE_GROUND;
+                }
+                break;
+            case TILE_KEY:
+                this.keysHeld ++;
+                document.getElementById('debugText').innerHTML = 'Keys: ' + this.keysHeld;
+
+                roomGrid[walkIntoTileIndex] = TILE_GROUND;
+                break;
+            case TILE_WALL:
+            default:
+                break;
+        }
     }
 }    

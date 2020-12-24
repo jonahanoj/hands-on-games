@@ -1,72 +1,80 @@
-const TRACK_W = 40,
-    TRACK_H = 40,
-    TRACK_COLS = 20,
-    TRACK_ROWS = 15;
+const ROOM_COLS = 16,
+ROOM_ROWS = 12;
+    
 
-var trackGrid =
-       [4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4,
-        4, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
-        1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-        1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1,
-        1, 0, 0, 0, 1, 1, 1, 4, 4, 4, 4, 1, 1, 1, 1, 1, 1, 0, 0, 1,
-        1, 0, 0, 1, 1, 1, 1, 1, 4, 4, 1, 1, 0, 0, 0, 1, 1, 0, 0, 1,
-        1, 0, 0, 1, 0, 0, 0, 0, 1, 4, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1,
-        1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1,
-        1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 5, 0, 0, 1, 0, 0, 1,
-        1, 2, 0, 1, 0, 0, 5, 0, 0, 0, 5, 0, 0, 1, 0, 0, 1, 0, 0, 1,
-        1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 5, 0, 0, 1,
-        1, 1, 5, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
-        0, 3, 0, 0, 0, 0, 1, 4, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1,
-        0, 3, 0, 0, 0, 0, 1, 4, 4, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1,
-        1, 1, 5, 1, 1, 1, 1, 4, 4, 4, 4, 4, 4, 1, 1, 1, 1, 1, 1, 1];
+var roomGrid =
+       [	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,
+        1,	0,	0,	0,	0,	0,	1,	0,	0,	0,	5,	0,	1,	1,	1,	1,
+        1,	0,	4,	0,	4,	0,	1,	0,	2,	0,	1,	0,	1,	4,	4,	1,
+        1,	0,	0,	0,	0,	0,	1,	0,	0,	0,	1,	5,	1,	5,	1,	1,
+        1,	1,	1,	5,	1,	1,	1,	0,	4,	0,	1,	0,	0,	0,	1,	1,
+        1,	0,	0,	0,	0,	0,	0,	0,	0,	0,	1,	0,	4,	0,	1,	1,
+        1,	0,	0,	0,	0,	0,	0,	0,	0,	0,	1,	0,	0,	0,	1,	1,
+        1,	0,	1,	1,	1,	1,	1,	1,	1,	1,	1,	0,	4,	0,	1,	1,
+        1,	0,	1,	0,	1,	0,	1,	0,	0,	0,	1,	0,	0,	0,	1,	1,
+        1,	0,	5,	0,	5,	0,	5,	0,	3,	0,	1,	1,	1,	1,	1,	1,
+        1,	0,	1,	0,	1,	0,	1,	0,	0,	0,	1,	1,	1,	1,	1,	1,
+        1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1];
 
-const TRACK_ROAD = 0,
-    TRACK_WALL = 1,
-    TRACK_PLAYER = 2,
-    TRACK_GOAL = 3,
-    TRACK_TREE = 4,
-    TRACK_FLAG = 5;
+const TILE_GROUND = 0,
+    TILE_W = 50,
+    TILE_H = 50,
+    TILE_WALL = 1,
+    TILE_PLAYER = 2,
+    TILE_GOAL = 3,
+    TILE_KEY = 4,
+    TILE_DOOR = 5;
 
-function trackTileToIndex(tileCol, tileRow) {
-    return (tileCol + TRACK_COLS * tileRow);
+    function tileTypeHasTransparency(checkTileType) {
+        return (checkTileType == TILE_GOAL ||
+            checkTileType == TILE_KEY ||
+            checkTileType == TILE_DOOR)
+    }
+
+function roomTileToIndex(tileCol, tileRow) {
+    return (tileCol + ROOM_COLS * tileRow);
 }
 
 function isWallAtTileCoord(trackTileCol, trackTileRow) {
-    return (trackGrid[trackTileToIndex(trackTileCol, trackTileRow)] == TRACK_WALL);
+    return (roomGrid[roomTileToIndex(trackTileCol, trackTileRow)] == TILE_WALL);
 }
 
-function getTrackAtPixelCoord(pixelX, pixelY) {
-    var tileCol = pixelX / TRACK_W;
-    var tileRow = pixelY / TRACK_H;
+function getTileIndexAtPixelCoord(pixelX, pixelY) {
+    var tileCol = pixelX / TILE_W;
+    var tileRow = pixelY / TILE_H;
 
     tileCol = Math.floor(tileCol);
     tileRow = Math.floor(tileRow);
 
-    if (tileCol < 0 || tileCol >= TRACK_COLS ||
-        tileRow < 0 || tileRow >= TRACK_ROWS) {
-        return TRACK_WALL;
-    }
+    if (tileCol < 0 || tileCol >= ROOM_COLS ||
+        tileRow < 0 || tileRow >= ROOM_ROWS) {
+            document.getElementById("debugText").innerHTML = 'out of bounds:' + pixelX + ',' + pixelY;
+        return undefined;
+     }
 
-    var trackIndex = trackTileToIndex(tileCol, tileRow);
-    return trackGrid[trackIndex];
+    var tileIndex = roomTileToIndex(tileCol, tileRow);
+    return tileIndex;
 }
 
-function drawTracks() {
-    var trackIndex = 0
-    var trackLeftEdgeX = 0
-    var trackTopEdgeY = 0
-    for (var eachRow = 0; eachRow < TRACK_ROWS; eachRow++) {
+function drawRoom() {
+    var tileIndex = 0
+    var tileLeftEdgeX = 0
+    var tileTopEdgeY = 0
+    for (var eachRow = 0; eachRow < ROOM_ROWS; eachRow++) {
 
-        trackLeftEdgeX = 0;
+        tileLeftEdgeX = 0;
 
-        for (var eachCol = 0; eachCol < TRACK_COLS; eachCol++) {
+        for (var eachCol = 0; eachCol < ROOM_COLS; eachCol++) {
         
-            var trackTypeHere = trackGrid[trackIndex];
-            ctx.drawImage(trackPics[trackTypeHere], trackLeftEdgeX, trackTopEdgeY);
+            var tileTypeHere = roomGrid[tileIndex];
+            if(tileTypeHasTransparency(tileTypeHere)) {
+                ctx.drawImage(tilePics[TILE_GROUND], tileLeftEdgeX, tileTopEdgeY);
+            }
+            ctx.drawImage(tilePics[tileTypeHere], tileLeftEdgeX, tileTopEdgeY);
 
-            trackIndex ++;
-            trackLeftEdgeX += TRACK_W;
+            tileIndex ++;
+            tileLeftEdgeX += TILE_W;
         }
-        trackTopEdgeY += TRACK_H;
+        tileTopEdgeY += TILE_H;
     }
 }

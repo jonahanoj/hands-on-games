@@ -10,7 +10,7 @@ window.onload = function () {
     ctx = canvas.getContext('2d');
 
     initInput();
-    p1.init(playerPic, 'Silver car');
+    p1.init(playerPic, 'You ');
     loadImages();
 };
 function loadingDone() {
@@ -28,6 +28,6 @@ function move() {
 }
 
 function draw() {
-    drawTracks();
+    drawRoom();
     p1.draw();
 }
