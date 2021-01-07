@@ -32,15 +32,17 @@ function shipClass() {
   }
 
   // key controls used for this 
-  this.setupControls = function (forwardKey, backKey, leftKey, rightKey) {
+  this.setupControls = function (forwardKey, backKey, leftKey, rightKey, shotKey) {
     this.controlKeyForGas = forwardKey;
     this.controlKeyForReverse = backKey;
     this.controlKeyForTurnLeft = leftKey;
     this.controlKeyForTurnRight = rightKey;
+    this.controlKeyForShotFire = shotKey;
   }
 
   this.init = function (whichGraphic) {
     this.myBitmap = whichGraphic;
+    this.myShot = new shotClass();
     this.reset();
   }
 
@@ -50,6 +52,7 @@ function shipClass() {
     this.y = canvas.height / 2
     this.driftX = 0;
     this.driftY = 0;
+    this.myShot.reset();
   } // end of reset 
 
   this.move = function () {
@@ -83,12 +86,17 @@ function shipClass() {
     this.handleScreenWrap();
     this.x += this.driftX;
     this.y += this.driftY;
-  }
+
+    this.myShot.move();
+  };
 
   this.draw = function () {
-    
-
+    this.myShot.draw();
     drawBitmapCenteredAtLocationWithRotation(this.myBitmap, this.x, this.y, this.ang);
-  }
+  };
+
+  this.cannonFire = function() {
+    this.myShot.shootFrom(this);
+  };
 
 } // end of class 
