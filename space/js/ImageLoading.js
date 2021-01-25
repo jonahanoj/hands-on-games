@@ -1,5 +1,5 @@
-var playerPic=document.createElement("img");
-var trackPics = [];
+var playerPic = document.createElement("img");
+var UFOPic = document.createElement("img");
 
 var picsToLoad = 0;
 
@@ -23,7 +23,8 @@ function loadImageForTrackCode(trackCode, fileName) {
 function loadImages() {
 
 var imageList = [
-  {varName:playerPic, theFile:"player1.png"}
+  {varName:playerPic, theFile:"player1.png"},
+  {varName:UFOPic, theFile:"ufo.png"}
   ];
 
 picsToLoad = imageList.length;

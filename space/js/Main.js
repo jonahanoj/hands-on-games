@@ -2,6 +2,7 @@
 var canvas, canvasContext;
 
 var p1 = new shipClass();
+var enemy = new UFOClass();
 
 window.onload = function() {
   canvas = document.getElementById('gameCanvas');
@@ -12,6 +13,7 @@ window.onload = function() {
 
 function loadingDoneSoStartGame() {  
   p1.init(playerPic); 
+  enemy.init(UFOPic);
   initInput();
   update();
 }
@@ -23,10 +25,12 @@ function update() {
 }
 
 function moveEverything() {
-  p1.move(); 
+  p1.move();
+  enemy.move();
 }
 
 function drawEverything() {
   colorRect(0, 0, canvas.width, canvas.height, 'black');
-  p1.draw(); 
+  p1.draw();
+  enemy.draw(); 
 }
