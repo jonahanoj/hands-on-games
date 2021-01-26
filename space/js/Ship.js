@@ -90,12 +90,14 @@ function shipClass() {
   this.checkMyShipAndShotCollisionAgainst = function(thisEnemy) {
     if(thisEnemy.isOverlappingPoint(this.x, this.y) ) {
       this.reset();
-      document.getElementById("debugText").innerHTML = "Player Crashed!"
+      timesShotEnemy--;
+      document.getElementById("debugText").innerHTML = timesShotEnemy + " Enemy(s) Blasted! " + "Player Crashed! - 1 point";
     }
     if(this.myShot.hitTest(thisEnemy) ) {
       thisEnemy.reset();
       this.myShot.reset();
-      document.getElementById("debugText").innerHTML = "Enemy Blasted!";
+      timesShotEnemy++;
+      document.getElementById("debugText").innerHTML = timesShotEnemy + " Enemy(s) Blasted!";
     }
   }
 } // end of class 

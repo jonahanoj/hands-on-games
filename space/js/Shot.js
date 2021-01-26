@@ -3,6 +3,8 @@ const SHOT_SPEED = 6.0;
 const SHOT_LIFE = 30;
 const SHOT_DISPLAY_RADIUS = 2.0;
 
+var timesShotEnemy = 0
+
 shotClass.prototype = new movingWrapPositionClass();
 
 function shotClass() {
