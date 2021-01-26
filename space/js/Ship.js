@@ -91,13 +91,13 @@ function shipClass() {
     if(thisEnemy.isOverlappingPoint(this.x, this.y) ) {
       this.reset();
       timesShotEnemy--;
-      document.getElementById("debugText").innerHTML = timesShotEnemy + " Enemy(s) Blasted! " + "Player Crashed! - 1 point";
+      document.getElementById("debugText").innerHTML = "Player Crashed! - 1 point";
     }
     if(this.myShot.hitTest(thisEnemy) ) {
       thisEnemy.reset();
       this.myShot.reset();
       timesShotEnemy++;
-      document.getElementById("debugText").innerHTML = timesShotEnemy + " Enemy(s) Blasted!";
+      document.getElementById("debugText").innerHTML = " Enemy Blasted! + 1 point";
     }
   }
 } // end of class 

@@ -7,6 +7,8 @@ var enemy = new UFOClass();
 window.onload = function() {
   canvas = document.getElementById('gameCanvas');
   canvasContext = canvas.getContext('2d');
+  canvasContext.font = '16px sans-serif';
+  canvasContext.textAlign = 'center';
   
   loadImages();
 }
@@ -33,5 +35,6 @@ function moveEverything() {
 function drawEverything() {
   colorRect(0, 0, canvas.width, canvas.height, 'black');
   p1.draw();
-  enemy.draw(); 
+  enemy.draw();
+  colorText(canvas.width - 100, 100, timesShotEnemy, 'yellow'); 
 }
