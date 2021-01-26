@@ -1,11 +1,11 @@
-// tuning constants 
+ 
 const UFO_SPEED = 1.9;
 const UFO_TIME_BETWEEN_CHANGE_DIR = 85;
+const UFO_COLLISION_RAIDIUS = 13;
 
 
 UFOClass.prototype = new movingWrapPositionClass();
 function UFOClass() {
-  // variables to keep track of position 
   this.x = 75;
   this.y = 75;
   this.yv = 0;
@@ -18,12 +18,11 @@ function UFOClass() {
 
   this.superclassReset = this.reset;
   this.reset = function () {
-
     this.cyclesTilDirectionChange = 0;
+    this.superclassReset();
+
     this.x = Math.random() * canvas.width;
     this.y = Math.random() * canvas.height;
-
-    this.superclassReset();
   } // end of reset
 
   this.superclassMove	=	this.move;
@@ -42,4 +41,11 @@ function UFOClass() {
   this.draw = function () {
     drawBitmapCenteredAtLocationWithRotation(this.myBitmap, this.x, this.y, 0);
   };
-}
+
+  this.isOverlappingPoint = function(testX, testY) {
+    var deltaX = testX - this.x;
+    var deltaY = testY - this.y;
+    var dist = Math.sqrt( (deltaX * deltaX) + (deltaY * deltaY) );
+    return (dist <= UFO_COLLISION_RAIDIUS);
+  }
+ }

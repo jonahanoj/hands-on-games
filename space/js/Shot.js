@@ -50,4 +50,12 @@ function shotClass() {
         }
     }
 
+    this.hitTest = function(thisEnemy) {
+        if (this.shotLife <= 0) {
+            return false;
+
+        }
+        return thisEnemy.isOverlappingPoint(this.x, this.y);
+    }
+
 } // end of class 

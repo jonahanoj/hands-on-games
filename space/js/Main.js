@@ -27,6 +27,7 @@ function update() {
 function moveEverything() {
   p1.move();
   enemy.move();
+  p1.checkMyShipAndShotCollisionAgainst(enemy);
 }
 
 function drawEverything() {
