@@ -48,10 +48,15 @@ function unitClass() {
         this.gotoY = aroundY + rowNum * UNIT_RANKS_SPACING;
     }
 
+    this.setTarget = function() {
+        // tbi
+    }
+
     this.resetAndSetPlayerTeam = function (playerTeam) {
         this.playerControlled = playerTeam;
         this.x = Math.random() * canvas.width / 4;
         this.y = Math.random() * canvas.height / 4;
+        this.myTarget = null;
 
         if(this.playerControlled == false) {
             this.x = canvas.width - this.x;
