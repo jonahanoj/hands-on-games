@@ -16,25 +16,7 @@ function mouseMovedEnoughToTreatAsDrag() {
 const MIN_DIST_FOR_MOUSE_CLICK_SELECTABLE = 12;
 
 function getUnitUnderMouse(currentMousePos) {
-    var closestDistanceFoundToMouse = MIN_DIST_FOR_MOUSE_CLICK_SELECTABLE;
-    var closestUnit = null;
-
-    for (var i = 0; i < playerUnits.length; i++) {
-        var pDist = playerUnits[i].distFrom(currentMousePos.x, currentMousePos.y);
-        if (pDist < closestDistanceFoundToMouse) {
-            closestUnit = playerUnits[i];
-            closestDistanceFoundToMouse = pDist;
-        }
-    }
-
-    for (var i = 0; i < enemyUnits.length; i++) {
-        var eDist = enemyUnits[i].distFrom(currentMousePos.x, currentMousePos.y);
-        if (eDist < closestDistanceFoundToMouse) {
-            closestUnit = enemyUnits[i];
-            closestDistanceFoundToMouse = eDist;
-        }
-    }
-    return closestUnit;
+    return findClosestUnitInRange(currentMousePos.x, currentMousePos.y, MIN_DIST_FOR_MOUSE_CLICK_SELECTABLE, allUnits);
 }
 
 var lassoX1 = 0;
@@ -81,6 +63,9 @@ var selectedUnits = [];
 
             if (clickedUnit != null && clickedUnit.playerControlled == false) {
                 document.getElementById('debugText').innerHTML = 'player commands ' + selectedUnits.length + ' units to attack!';
+                for (var i = 0; i < selectedUnits.length; i++) {
+                    selectedUnits[i].setTarget(clickedUnit);
+                }
             } else {
                 var unitsAlongSide = Math.floor(Math.sqrt(selectedUnits.length + 2));
                 for (var i = 0; i < selectedUnits.length; i++) {
