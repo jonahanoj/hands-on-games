@@ -11,8 +11,8 @@ window.onload = function () {
     ctx = canvas.getContext('2d');
 
     initInput();
-    p1.carInit(carPic, 'Silver car');
-    p2.carInit(car2Pic, 'Gold car');
+    p1.carInit(carPic, 'Silver car', 0);
+    p2.carInit(car2Pic, 'Gold car', 1);
     loadImages();
 };
 
