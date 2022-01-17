@@ -37,7 +37,11 @@
             WIN_SCORE = 3,
             Y_FACTOR = 2.5,
             P1_COLOR = 'red',
-            P2_COLOR = 'blue';
+            P2_COLOR = 'blue',
+            KEY_SPEED = 10,
+            K_UP = 38,
+            K_DOWN = 40,
+            K_SPACE = 32;
 
         var canvas,
             canvasContext,
@@ -48,9 +52,11 @@
             ballColor = P1_COLOR,
             paddle1Y = 250,
             paddle2Y = 250
-        p1Score = 0,
+            p1Score = 0,
             p2Score = 0,
-            showingWinScreen = false;
+            keysPressed = {},
+            keyMoveY = 0,
+            pauseGame = false;
 
 
 
@@ -66,15 +72,26 @@
                 paddle1Y = mousePos.y - (PADDLE_HEIGHT / 2);
             });
 
+            document.addEventListener("keydown", function(evt) {
+                keysPressed[evt.keyCode] = true;
+                if(evt.keyCode == K_SPACE) {
+                    pauseGame = !pauseGame ;
+                }
+            });
+
+            document.addEventListener("keyup", function (evt) {
+                keysPressed[evt.keyCode] = false;
+            });
+
             canvas.addEventListener('click', function (evt) {
-                showingWinScreen = false;
+                pauseGame = !pauseGame;
             });
 
             update();
         };
 
         function update() {
-            if (!showingWinScreen) {
+            if (!pauseGame) {
                 drawEverything();
                 moveEverything();
             }
@@ -84,7 +101,7 @@
 
         function ballReset() {
             if (p1Score == WIN_SCORE || p2Score == WIN_SCORE) {
-                showingWinScreen = true;
+                pauseGame = true;
                 colorRect(0, 0, canvas.width, canvas.height, 'black');
                 printScores();
                 var whoWon = p1Score > p2Score ? 'You Win!' : 'Computer Won!';
@@ -108,9 +125,31 @@
             }
         }
 
+        function movePlayerPaddle() {
+            if(keysPressed[K_UP] && keysPressed[K_DOWN]) {
+                keyMoveY = 0;
+            } else if(keysPressed[K_UP]) {
+                keyMoveY = KEY_SPEED * -1;
+            } else if(keysPressed[K_DOWN]) {
+                keyMoveY = KEY_SPEED;
+            } else {
+                keyMoveY = 0;
+            }
+
+            paddle1Y += keyMoveY;
+            var paddle1Center = paddle1Y + PADDLE_HEIGHT / 2;
+            if(paddle1Center < 0) {
+                paddle1Y = PADDLE_HEIGHT / -2;
+            } else if(paddle1Center > canvas.height) {
+                paddle1Y = canvas.height - PADDLE_HEIGHT / 2; 
+            }
+            
+        }
+
         function moveEverything() {
 
             moveComputerPaddle();
+            movePlayerPaddle();
 
             if (ballX < 0) { // ball is past left side screen
                 ballSpeedX *= -1;
@@ -143,6 +182,8 @@
 
             ballX += ballSpeedX;
             ballY += ballSpeedY;
+
+
         }
 
         function colorRect(topLeftX, topLeftY, boxWidth, boxHeight, fillColor) {
@@ -169,8 +210,8 @@
 
         function drawEverything() {
             colorRect(0, 0, canvas.width, canvas.height, 'black');
-            colorRect(0, paddle1Y, PADDLE_THICKNESS, PADDLE_HEIGHT, 'red');
-            colorRect(canvas.width - PADDLE_THICKNESS, paddle2Y, PADDLE_THICKNESS, PADDLE_HEIGHT, 'blue');
+            colorRect(0, paddle1Y, PADDLE_THICKNESS, PADDLE_HEIGHT, P1_COLOR);
+            colorRect(canvas.width - PADDLE_THICKNESS, paddle2Y, PADDLE_THICKNESS, PADDLE_HEIGHT, P2_COLOR);
 
             for (var i = 0; i < canvas.height / 40; i++) {
                 colorRect(canvas.width / 2 - 1, i * 40, 2, 20, 'white')
