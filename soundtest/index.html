@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<meta content="utf-8" http-equiv="encoding">
+</head>
+<body>
+    <canvas	id="gameCanvas"	width="800"	height="600"></canvas>
+    <script src="SoundAndMusic.js"></script>
+<script>
+var canvas, canvasContext;
+var	coin = new SoundOverlapsClass();
+var	explode = new SoundOverlapsClass();
+var	backgroundMusic	= new BackgroundMusicClass();
+
+
+function mouseupHandler()	{
+	backgroundMusic.startOrStopMusic();
+}
+
+function keyPressed(evt)	{
+	backgroundMusic.loopSong("../game_audio/saloon");
+	evt.preventDefault();
+}
+
+window.onload = function() {
+    explode.load("../game_audio/explode");
+    coin.load("../game_audio/coin");
+  canvas = document.getElementById('gameCanvas');
+  canvasContext = canvas.getContext('2d');
+  canvas = document.getElementById('gameCanvas');
+  canvas.addEventListener('mouseup',mouseupHandler);
+  document.addEventListener('keydown',keyPressed);
+  canvasContext.fillRect(0, 0, canvas.width, canvas.height);
+  backgroundMusic.loopSong("../game_audio/saloon");
+}
+</script>
+</body>
+</html>
