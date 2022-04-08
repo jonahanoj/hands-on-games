@@ -13,6 +13,7 @@ function carClass() {
     this.keyHeld_Reverse = false;
     this.keyHeld_TurnLeft = false;
     this.keyHeld_TurnRight = false;
+    this.justYeeted = false;
 
     this.setupControls = function(forwardKey, backKey, leftKey, rightKey) {
         this.controlKeyForGas = forwardKey;
@@ -91,9 +92,17 @@ function carClass() {
 
         var drivingIntoTileType = getTrackAtPixelCoord(nextX, nextY);
 
-        if(drivingIntoTileType == TRACK_ROAD) {
+        if(drivingIntoTileType == TRACK_ROAD || drivingIntoTileType == TRACK_BOOST || drivingIntoTileType == TRACK_DIRTY) {
             this.carX = nextX;
             this.carY = nextY;
+            if (drivingIntoTileType == TRACK_BOOST && this.justYeeted == false) {
+                this.carSpeed = 17;
+                this.justYeeted = true;
+            }
+            if (drivingIntoTileType !== TRACK_BOOST) {
+                this.justYeeted = false;
+            }
+
         } else if(drivingIntoTileType == TRACK_GOAL) {
             document.getElementById('debugText').innerHTML = this.myName + ' won the race!';
             curlvl++;
